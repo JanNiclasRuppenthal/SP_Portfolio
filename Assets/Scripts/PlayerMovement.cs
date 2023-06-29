@@ -1,34 +1,43 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.XR;
 
 public class PlayerMovement : MonoBehaviour
 {
     private Rigidbody rb;
-    private float moveSpeed = 1000f;
-    private Vector3 massCenter;
+    private float moveSpeed = 500f;
+    public Vector3 massCenter;
+
+    private Camera mainCamera;
 
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
         massCenter = rb.centerOfMass;
+        mainCamera = Camera.main;
     }
 
     private void FixedUpdate()
     {
-        // Spieler-Input abrufen
-        float verticalInput = Input.GetAxis("Vertical");
         float horizontalInput = Input.GetAxis("Horizontal");
+        float verticalInput = Input.GetAxis("Vertical");
 
-        // Zentrum der Masse basierend auf dem Spieler-Input anpassen
-        rb.AddForce(new Vector3(horizontalInput * moveSpeed * Time.fixedDeltaTime,0, verticalInput * moveSpeed * Time.fixedDeltaTime));
-        
+        // Richtung der Kamera in der horizontalen Ebene
+        Vector3 cameraForward = mainCamera.transform.forward;
+        cameraForward.y = 0f;
+        cameraForward.Normalize();
+
+        // Richtung der Kamera senkrecht zur horizontalen Ebene
+        Vector3 cameraRight = mainCamera.transform.right;
+
+        // Bewegungsrichtung berechnen basierend auf Kamerarotation und Spieler-Input
+        Vector3 movementDirection = (cameraRight * horizontalInput + cameraForward * verticalInput).normalized;
+
+        // Kraft anwenden, basierend auf der Bewegungsrichtung und der Rotationsgeschwindigkeit der Kamera
+        rb.AddForce(movementDirection * moveSpeed * Time.fixedDeltaTime);
     }
 
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.yellow;
-        Gizmos.DrawSphere(transform.position + transform.rotation * massCenter, .5f);
+        Gizmos.DrawSphere(transform.position + /*transform.rotation */ massCenter, .5f);
     }
 }

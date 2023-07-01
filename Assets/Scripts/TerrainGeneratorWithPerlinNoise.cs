@@ -13,7 +13,7 @@ public class TerrainGeneratorWithPerlinNoise : MonoBehaviour
 
     public float radius = 118f;
 
-    private void Update()
+    private void Start()
     {
         Terrain terrain = GetComponent<Terrain>();
         terrain.terrainData = GenerateNewTerrain(terrain.terrainData);

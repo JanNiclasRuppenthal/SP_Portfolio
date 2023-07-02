@@ -2,20 +2,20 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    private Rigidbody rb;
-    private float moveSpeed = 500f;
-    public Vector3 massCenter;
+    public Vector3 MassCenter { get; set; }
+    public GameObject CenterOfMass;
 
+    private Rigidbody rBody;
+    private float moveSpeed = 500f;
     private Camera mainCamera;
-    private bool massCenterMovement = false;
+    protected bool MassCenterMovement { get; set; } = false;
     private CameraMovement cameraMovement;
     private TerrainCollider terrainCollider;
     private bool isGrounded;
 
     private void Start()
     {
-        rb = GetComponent<Rigidbody>();
-        massCenter = rb.centerOfMass;
+        rBody = GetComponent<Rigidbody>();
         mainCamera = Camera.main;
         terrainCollider = Terrain.activeTerrain.GetComponent<TerrainCollider>();
 
@@ -26,7 +26,8 @@ public class PlayerMovement : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.M)) // Tastendruck erfassen (hier M)
         {
-            massCenterMovement = !massCenterMovement; // Kameramodus umschalten
+            MassCenterMovement = !MassCenterMovement; // Kameramodus umschalten
+            CenterOfMass.SetActive(MassCenterMovement);
         }
 
         // Prüfe, ob die Kugel den Boden berührt
@@ -36,7 +37,7 @@ public class PlayerMovement : MonoBehaviour
         // Springen, wenn die Kugel den Boden berührt und die Leertaste gedrückt wird
         if (isGrounded && Input.GetKeyDown(KeyCode.Space))
         {
-            rb.AddForce(Vector3.up * moveSpeed/1.25f);
+            rBody.AddForce(Vector3.up * moveSpeed/1.25f);
         }
     }
 
@@ -45,7 +46,7 @@ public class PlayerMovement : MonoBehaviour
         float horizontalInput = Input.GetAxis("Horizontal");
         float verticalInput = Input.GetAxis("Vertical");
 
-        if (!massCenterMovement )
+        if (!MassCenterMovement)
         {
             // Richtung der Kamera in der horizontalen Ebene
             Vector3 cameraForward = mainCamera.transform.forward;
@@ -69,13 +70,13 @@ public class PlayerMovement : MonoBehaviour
 
 
             // Kraft anwenden, basierend auf der Bewegungsrichtung und der Rotationsgeschwindigkeit der Kamera
-            rb.AddForce(movementDirection * moveSpeed * Time.fixedDeltaTime);
+            rBody.AddForce(movementDirection * moveSpeed * Time.fixedDeltaTime);
         }
         else
         {
-            rb.centerOfMass = new Vector3(horizontalInput, 0, verticalInput) * 2f;
-            rb.WakeUp();
-            massCenter = rb.centerOfMass;
+            rBody.centerOfMass = new Vector3(horizontalInput, 0, verticalInput) * 2f;
+            CenterOfMass.transform.position = transform.position + transform.rotation * rBody.centerOfMass;
+            rBody.WakeUp();
         }
 
     }
@@ -83,6 +84,6 @@ public class PlayerMovement : MonoBehaviour
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.yellow;
-        Gizmos.DrawSphere(transform.position + transform.rotation * massCenter, .5f);
+        Gizmos.DrawSphere(transform.position + transform.rotation * MassCenter, .5f);
     }
 }

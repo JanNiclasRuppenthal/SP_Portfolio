@@ -13,7 +13,7 @@ public class CameraMovement : MonoBehaviour
     private float mouseY;
     private float tempMouseY;
 
-    public bool IsInsideTarget { get; set; } = false; // Flag, um den Kameramodus zu verfolgen
+    public bool IsInsideTarget { get; set; } = true; // Flag, um den Kameramodus zu verfolgen
 
     private void Update()
     {

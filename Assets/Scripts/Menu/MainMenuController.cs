@@ -1,7 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class MainMenuController : MonoBehaviour
 {
@@ -12,6 +9,7 @@ public class MainMenuController : MonoBehaviour
 
     public void StartGame()
     {
+        // activate all GameObjects to play the game
         this.gameObject.SetActive(false);
 
         for (int i = 0; i < gameObjects.Length; i++)
@@ -22,6 +20,7 @@ public class MainMenuController : MonoBehaviour
 
     public void ShowControls()
     {
+        // show the text with the copntrols
         showControlsText = !showControlsText;
         controlsText.SetActive(showControlsText);
     }
@@ -35,6 +34,6 @@ public class MainMenuController : MonoBehaviour
     public void Quit()
     {
         Debug.Log("Quit the Game!");
-        Application.Quit();
+        Application.Quit(); // This only works in the build
     }
 }

@@ -2,16 +2,14 @@ using UnityEngine;
 
 public class TerrainGeneratorWithPerlinNoise : MonoBehaviour
 {
-    public int depth = 10;
+    public int depth;
+    public float scale;
+    public float perlinScaleX;
+    public float perlinScaleY;
+    public float radius;
 
-    public int width = 256;
-    public int height = 256;
-
-    public float scale = 5.0f;
-    public float perlinScaleX = 2.0f;
-    public float perlinScaleY = 4.0f;
-
-    public float radius = 118f;
+    private int width = 128;
+    private int height = 128;
 
     private void Start()
     {
@@ -22,9 +20,7 @@ public class TerrainGeneratorWithPerlinNoise : MonoBehaviour
     private TerrainData GenerateNewTerrain(TerrainData dataOfTerrain)
     {
         dataOfTerrain.heightmapResolution = width + 1;
-
         dataOfTerrain.size = new Vector3(width, depth, height); // (x, y, z)
-
         dataOfTerrain.SetHeights(0, 0, GenerateHeightsWithPerlinNoise());
 
         return dataOfTerrain;
@@ -45,14 +41,14 @@ public class TerrainGeneratorWithPerlinNoise : MonoBehaviour
                 float differenceYToCenter = (indexY - centerOffsetY);
                 if (Mathf.Sqrt(differenceXToCenter * differenceXToCenter + differenceYToCenter * differenceYToCenter) > radius)
                 {
-                    heights[indexX, indexY] = depth;
+                    heights[indexX, indexY] = depth; // if it is not in the defined circle then ste the maximum height
                     continue;
                 }
 
                 float x = (differenceXToCenter / width) * scale;
                 float y = (differenceYToCenter / height) * scale;
                 float p = (Mathf.Pow(x, 4) + Mathf.Pow(y, 4)) / 10f;
-                heights[indexX, indexY] = Mathf.PerlinNoise(x * perlinScaleX, y * perlinScaleY) * p;
+                heights[indexX, indexY] = Mathf.PerlinNoise(x * perlinScaleX, y * perlinScaleY) * p; /// Perlin Noise with parameters and the polynom
             }
         }
 

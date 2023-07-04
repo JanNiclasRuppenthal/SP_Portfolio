@@ -1104,7 +1104,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 699453352}
   m_LocalRotation: {x: 0.0006314182, y: -0, z: -0, w: 0.9999998}
-  m_LocalPosition: {x: 35.832466, y: 20.25429, z: -104.02477}
+  m_LocalPosition: {x: 35, y: 20, z: -105}
   m_LocalScale: {x: 3, y: 3, z: 3}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1790,7 +1790,7 @@ MonoBehaviour:
   height: 128
   scale: 5
   perlinScaleX: 1.5
-  perlinScaleY: 3
+  perlinScaleY: 2.15
   radius: 60
 --- !u!154 &1255072589
 TerrainCollider:
@@ -2369,9 +2369,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 92634fb57d2d4344580dd71b7890644d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  massCenterOfParent: {x: 0, y: 0, z: 0}
-  playerMovement: {fileID: 0}
-  parentTransform: {fileID: 0}
 --- !u!135 &2030715530
 SphereCollider:
   m_ObjectHideFlags: 0

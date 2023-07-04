@@ -5,7 +5,7 @@ public class PlayerMovement : MonoBehaviour
     public Vector3 MassCenter { get; set; }
     public GameObject CenterOfMass;
 
-    private Rigidbody rBody;
+    private Rigidbody rigidbody;
     private float moveSpeed = 500f;
     private Camera mainCamera;
     protected bool MassCenterMovement { get; set; } = false;
@@ -13,31 +13,32 @@ public class PlayerMovement : MonoBehaviour
     private TerrainCollider terrainCollider;
     private bool isGrounded;
 
+
     private void Start()
     {
-        rBody = GetComponent<Rigidbody>();
+        // initialize variables
+        rigidbody = GetComponent<Rigidbody>();
         mainCamera = Camera.main;
         terrainCollider = Terrain.activeTerrain.GetComponent<TerrainCollider>();
-
         cameraMovement = mainCamera.GetComponent<CameraMovement>();
     }
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.M)) // Tastendruck erfassen (hier M)
+        // switch the movement of the sphere
+        if (Input.GetKeyDown(KeyCode.M)) 
         {
-            MassCenterMovement = !MassCenterMovement; // Kameramodus umschalten
+            MassCenterMovement = !MassCenterMovement;
             CenterOfMass.SetActive(MassCenterMovement);
         }
 
-        // Prüfe, ob die Kugel den Boden berührt
+        // test if sphere is colliding with terrain (with local point (0, -1, 0))
         isGrounded = Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, 1.6f) &&
                      hit.collider == terrainCollider;
 
-        // Springen, wenn die Kugel den Boden berührt und die Leertaste gedrückt wird
         if (isGrounded && Input.GetKeyDown(KeyCode.Space))
         {
-            rBody.AddForce(Vector3.up * moveSpeed/1.25f);
+            rigidbody.AddForce(Vector3.up * moveSpeed/1.25f); // jump
         }
     }
 
@@ -48,36 +49,37 @@ public class PlayerMovement : MonoBehaviour
 
         if (!MassCenterMovement)
         {
-            // Richtung der Kamera in der horizontalen Ebene
-            Vector3 cameraForward = mainCamera.transform.forward;
-            cameraForward.y = 0f;
-            cameraForward.Normalize();
-
-            // Richtung der Kamera senkrecht zur horizontalen Ebene
-            Vector3 cameraRight = mainCamera.transform.right;
-
-            // Bewegungsrichtung berechnen basierend auf Kamerarotation und Spieler-Input
-            Vector3 movementDirection;
-            if (cameraMovement.IsInsideTarget)
-            {
-                movementDirection = (Vector3.right * horizontalInput + Vector3.forward * verticalInput).normalized;
-
-            }
-            else
-            {
-                movementDirection = (cameraRight * horizontalInput + cameraForward * verticalInput).normalized;
-            }
-
-
-            // Kraft anwenden, basierend auf der Bewegungsrichtung und der Rotationsgeschwindigkeit der Kamera
-            rBody.AddForce(movementDirection * moveSpeed * Time.fixedDeltaTime);
+            Vector3 movementDirection = calculateMovementDirection(horizontalInput, verticalInput);
+            rigidbody.AddForce(movementDirection * moveSpeed * Time.fixedDeltaTime);
         }
         else
         {
-            rBody.centerOfMass = new Vector3(horizontalInput, 0, verticalInput) * 2f;
-            CenterOfMass.transform.position = transform.position + transform.rotation * rBody.centerOfMass;
-            rBody.WakeUp();
+            // movement is based on centerOfMass
+            rigidbody.centerOfMass = new Vector3(horizontalInput, 0, verticalInput) * 2f;
+            CenterOfMass.transform.position = transform.position + transform.rotation * rigidbody.centerOfMass;
+            rigidbody.WakeUp();
         }
 
+    }
+
+    private Vector3 calculateMovementDirection(float hInput, float vInput)
+    {
+        Vector3 cameraForward = mainCamera.transform.forward;
+        cameraForward.y = 0f;
+        cameraForward.Normalize();
+        Vector3 cameraRight = mainCamera.transform.right;
+
+        Vector3 result;
+        if (cameraMovement.IsInsideTarget)
+        {
+            result = (Vector3.right * hInput + Vector3.forward * vInput).normalized;
+        }
+        else
+        {
+            // movement is dependent of position of camera
+            result = (cameraRight * hInput + cameraForward * vInput).normalized;
+        }
+
+        return result;
     }
 }
